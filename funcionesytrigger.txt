@@ -1,0 +1,69 @@
+Ejercicios Parcial 2
+
+Alumna: Jofre Micaelaa
+Carrera: Web Master
+Materia: Base de datos
+
+
+1. Crear una función con el objeto de obtener el nombre del cliente. 
+Escriba la consulta para mostrar el resultado.cuando consultamos el encabezado de las facturas
+
+DELIMITER $$
+DROP FUNCTION IF EXISTS nombre_cli$$
+CREATE FUNCTION nombre_cli(p_cli INT)
+  RETURNS VARCHAR(100)
+BEGIN
+  DECLARE v_nomcli VARCHAR(100) default null;
+    SELECT clnom into v_nomcli
+    FROM clientes c, factcab f
+    WHERE c.clid = f.clid
+   AND f.facid = p_cli;
+  RETURN v_nomcli;
+END $$
+
+DELIMITER ;
+
+
+
+2. Crear una función para obtener el total de la factura.
+
+
+DELIMITER $$
+DROP FUNCTION IF EXISTS total_factura$$
+CREATE FUNCTION total_factura(p_facid INT)
+  RETURNS DECIMAL(10,2)
+BEGIN
+  DECLARE v_total DEC(10,2) default 0.00;
+  SELECT SUM(det.detcan * det.detpreuni) into v_total
+    FROM factdet det, factcab f
+    WHERE det.facid = f.facid
+	 and f.facid = p_facid;
+  RETURN v_total;
+END $$
+
+DELIMITER ;
+
+
+CONSULTA=
+select nombre_cli(00001) as nombre, total_factura(00001) as total;
+--------------------------------
+
+3. Crear un trigger que actualice el stock después de efectuada una venta.
+DELIMITER $$
+DROP TRIGGER if EXISTS actualizar_stock$$
+CREATE TRIGGER actualizar_stock
+AFTER INSERT ON factdet
+FOR EACH ROW
+BEGIN
+UPDATE productos
+SET prstock = prstock- NEW.detcan
+where prid = NEW.prid;
+END$$
+DELIMITER;
+
+
+Consulta  de stock:
+select prid , prstock
+from productos 
+group by  prid, prstock
+

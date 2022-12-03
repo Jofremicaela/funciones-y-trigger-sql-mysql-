@@ -1,0 +1,59 @@
+create table clientes
+(
+    clid       INTEGER               not null,
+    clnom      VARCHAR(100)          not null,
+    clcuit     VARCHAR(50)           not null,
+    cltel      VARCHAR(50)           not null,
+    primary key (clid)
+);
+
+create unique index clientes_PK on clientes (clid asc);
+
+create table productos
+(
+    prid       INTEGER               not null,
+    prcod      VARCHAR(20)           not null,
+    prnom      VARCHAR(200)          not null,
+    prpu       DECIMAL(10,2)         not null,
+    prstock    INTEGER               not null,
+    primary key (prid)
+);
+
+create unique index productos_PK on productos (prid asc);
+
+create table factcab
+(
+    facid      INTEGER               not null,
+    clid       INTEGER               not null,
+    facipo     VARCHAR(2)            not null,
+    facnro     INTEGER               not null,
+    facfech    DATE                  not null,
+    primary key (facid),
+    foreign key  (clid)
+       references clientes (clid)
+);
+
+create unique index factcab_PK on factcab (facid asc);
+
+create index Relation_41_FK on factcab (clid asc);
+
+create table factdet
+(
+    facid      INTEGER               not null,
+    detitem    INTEGER               not null,
+    prid       INTEGER               not null,
+    detcan     INTEGER               not null,
+    detpreuni  DECIMAL(10,2)         not null,
+    primary key (facid, detitem),
+    foreign key  (facid)
+       references factcab (facid),
+    foreign key  (prid)
+       references productos (prid)
+);
+
+create unique index factdet_PK on factdet (facid asc, detitem asc);
+
+create index Relation_42_FK on factdet (facid asc);
+
+create index Relation_43_FK on factdet (prid asc);
+
